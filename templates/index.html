@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Base de Datos en Tiempo Real</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- ========== TOAST CONTAINER ========== -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">RT</div>
+      <h1>RealTimeDB <span>Inventario en Tiempo Real</span></h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="cargarDatos()">↻ Actualizar</button>
+      <button class="btn btn-danger btn-sm" onclick="resetearDB()">Reiniciar DB</button>
+    </div>
+  </header>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main">
+
+    <!-- ===== Estadísticas ===== -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-label">Productos</div>
+        <div class="stat-value" id="stat-productos">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-label">Ventas Totales</div>
+        <div class="stat-value" id="stat-ventas">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Stock Total</div>
+        <div class="stat-value" id="stat-stock">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Valor Inventario</div>
+        <div class="stat-value" id="stat-valor">$0</div>
+      </div>
+    </section>
+
+    <!-- ===== Content Grid ===== -->
+    <div class="content-grid">
+
+      <!-- ===== Columna Principal ===== -->
+      <div>
+
+        <!-- Panel de Simulación -->
+        <div class="sim-panel">
+          <h3>⚡ Simulación de Concurrencia</h3>
+          <p>Lanza múltiples hilos (threads) que ejecutan ventas simultáneas. El sistema usa threading.Lock para evitar condiciones de carrera.</p>
+          <div class="sim-controls">
+            <div class="form-group">
+              <label>Hilos (threads)</label>
+              <input type="number" id="sim-hilos" class="form-input" value="8" min="2" max="20" />
+            </div>
+            <div class="form-group">
+              <label>Cant. por venta</label>
+              <input type="number" id="sim-cantidad" class="form-input" value="2" min="1" max="50" />
+            </div>
+            <button class="btn btn-primary" id="btn-simular" onclick="simularVentas()">
+              ▶ Simular Ventas Concurrentes
+            </button>
+          </div>
+          <div class="sim-results" id="sim-results"></div>
+        </div>
+
+        <!-- Tabla de Productos -->
+        <div class="card">
+          <div class="card-header">
+            <h2>📋 Inventario de Productos</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Producto</th>
+                  <th>Stock</th>
+                  <th>Precio</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="productos-body">
+                <tr><td colspan="5" class="empty-state">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Columna Lateral ===== -->
+      <div>
+
+        <!-- Formulario Agregar Producto -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-header">
+            <h2>➕ Agregar Producto</h2>
+          </div>
+          <div class="card-body">
+            <form id="form-producto" onsubmit="agregarProducto(event)">
+              <div class="form-group">
+                <label>Nombre del producto</label>
+                <input type="text" id="prod-nombre" class="form-input" placeholder="Ej: Tablet Samsung" required />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Stock inicial</label>
+                  <input type="number" id="prod-stock" class="form-input" placeholder="50" min="0" required />
+                </div>
+                <div class="form-group">
+                  <label>Precio (RD$)</label>
+                  <input type="number" id="prod-precio" class="form-input" placeholder="9999.99" min="0" step="0.01" required />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 4px;">
+                Agregar Producto
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Eventos en Tiempo Real -->
+        <div class="card">
+          <div class="card-header">
+            <h2>📡 Eventos en Tiempo Real</h2>
+            <span style="font-size: 11px; color: var(--text-muted);">Auto-refresh 3s</span>
+          </div>
+          <div class="events-list" id="eventos-list">
+            <div class="empty-state">Cargando eventos...</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
